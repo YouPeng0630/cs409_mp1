@@ -2,6 +2,61 @@ const navbar = document.getElementById("navbar");
 const sections = document.querySelectorAll("section");
 const navLinks = document.querySelectorAll(".nav-links a");
 
+// Smooth scroll with JavaScript animation
+function smoothScroll(element) {
+    const target = element.getBoundingClientRect().top + window.scrollY - navbar.offsetHeight;
+    const start = window.scrollY;
+    const distance = target - start;
+    const duration = 800; // 800ms animation
+    let startTime = null;
+
+    function animation(currentTime) {
+        if (startTime === null) startTime = currentTime;
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const ease = progress < 0.5 
+            ? 2 * progress * progress 
+            : -1 + (4 - 2 * progress) * progress;
+        
+        window.scrollTo(0, start + distance * ease);
+        
+        if (progress < 1) {
+            requestAnimationFrame(animation);
+        }
+    }
+
+    requestAnimationFrame(animation);
+}
+
+// Handle hash changes
+window.addEventListener("hashchange", function () {
+    const hash = window.location.hash;
+    if (hash) {
+        const targetId = hash.substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+            smoothScroll(targetElement);
+        }
+    }
+});
+
+// Also support clicking Learn More buttons
+document.addEventListener("click", function (event) {
+    if (event.target.tagName === "A" && event.target.href.includes("#")) {
+        const hash = event.target.getAttribute("href");
+        if (hash && hash.startsWith("#")) {
+            event.preventDefault();
+            const targetId = hash.substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                window.location.hash = hash;
+            }
+        }
+    }
+});
+
 window.addEventListener("scroll", function () {
 
     // Navbar resizing
