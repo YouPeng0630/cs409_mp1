@@ -2,59 +2,52 @@ const navbar = document.getElementById("navbar");
 const sections = document.querySelectorAll("section");
 const navLinks = document.querySelectorAll(".nav-links a");
 
-// Smooth scroll with JavaScript animation
-function smoothScroll(element) {
-    const target = element.getBoundingClientRect().top + window.scrollY - navbar.offsetHeight;
-    const start = window.scrollY;
-    const distance = target - start;
-    const duration = 800; // 800ms animation
+// Manual smooth-scroll animation.
+// We deliberately do NOT rely on CSS `scroll-behavior: smooth` or
+// `scrollIntoView({ behavior: "smooth" })` because browsers automatically
+// disable both when the OS/browser has "reduce motion" enabled
+// (prefers-reduced-motion: reduce), causing the page to jump instantly
+// with no animation. Animating via repeated `window.scrollTo` calls in
+// a requestAnimationFrame loop is not affected by that setting, so the
+// scroll animation always plays consistently.
+function smoothScrollTo(targetElement) {
+    const targetY = targetElement.getBoundingClientRect().top + window.scrollY - navbar.offsetHeight;
+    const startY = window.scrollY;
+    const distance = targetY - startY;
+    const duration = 700;
     let startTime = null;
 
-    function animation(currentTime) {
-        if (startTime === null) startTime = currentTime;
-        const elapsed = currentTime - startTime;
+    function step(timestamp) {
+        if (startTime === null) startTime = timestamp;
+        const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
-        // Easing function for smooth animation
-        const ease = progress < 0.5 
-            ? 2 * progress * progress 
-            : -1 + (4 - 2 * progress) * progress;
-        
-        window.scrollTo(0, start + distance * ease);
-        
+
+        // easeInOutQuad
+        const ease = progress < 0.5
+            ? 2 * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+        window.scrollTo(0, startY + distance * ease);
+
         if (progress < 1) {
-            requestAnimationFrame(animation);
+            requestAnimationFrame(step);
         }
     }
 
-    requestAnimationFrame(animation);
+    requestAnimationFrame(step);
 }
 
-// Handle hash changes
-window.addEventListener("hashchange", function () {
-    const hash = window.location.hash;
-    if (hash) {
-        const targetId = hash.substring(1);
-        const targetElement = document.getElementById(targetId);
-        if (targetElement) {
-            smoothScroll(targetElement);
-        }
-    }
-});
-
-// Also support clicking Learn More buttons
 document.addEventListener("click", function (event) {
-    if (event.target.tagName === "A" && event.target.href.includes("#")) {
-        const hash = event.target.getAttribute("href");
-        if (hash && hash.startsWith("#")) {
-            event.preventDefault();
-            const targetId = hash.substring(1);
-            const targetElement = document.getElementById(targetId);
-            if (targetElement) {
-                window.location.hash = hash;
-            }
-        }
-    }
+    const link = event.target.closest('a[href^="#"]');
+    if (!link) return;
+
+    const targetId = link.getAttribute("href").substring(1);
+    const targetElement = document.getElementById(targetId);
+    if (!targetElement) return;
+
+    event.preventDefault();
+    smoothScrollTo(targetElement);
+    window.history.pushState(null, null, "#" + targetId);
 });
 
 window.addEventListener("scroll", function () {

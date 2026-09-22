@@ -10,6 +10,8 @@ module.exports = {
     open: true,
     host: "localhost",
     watchFiles: 'index.html',
+    hot: false,
+    liveReload: true,
   },
   context: path.join(__dirname, 'src'),
   entry: "./index.js",

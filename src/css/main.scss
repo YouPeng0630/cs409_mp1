@@ -30,10 +30,6 @@ $border-color: #d7e5d4;
     box-sizing: border-box;
 }
 
-html {
-    scroll-behavior: smooth;
-}
-
 // ================================
 // CSS3 Animations
 // ================================
@@ -121,6 +117,7 @@ body {
 section {
     min-height: 100vh;
     padding: 100px 0;
+    scroll-margin-top: 90px;
 }
 
 
