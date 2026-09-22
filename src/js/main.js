@@ -2,25 +2,6 @@ const navbar = document.getElementById("navbar");
 const sections = document.querySelectorAll("section");
 const navLinks = document.querySelectorAll(".nav-links a");
 
-// Smooth scrolling for navigation links
-navLinks.forEach(function (link) {
-    link.addEventListener("click", function (event) {
-        const href = link.getAttribute("href");
-        
-        // Only prevent default for hash links
-        if (href.startsWith("#")) {
-            event.preventDefault();
-            
-            const targetId = href.substring(1);
-            const targetSection = document.getElementById(targetId);
-            
-            if (targetSection) {
-                targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
-        }
-    });
-});
-
 window.addEventListener("scroll", function () {
 
     // Navbar resizing
